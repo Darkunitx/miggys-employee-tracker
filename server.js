@@ -29,13 +29,13 @@ function init() {
                     viewEmployees();
                     break;
 
-                // case 'Add Employee':
-                //     addEmployee();
-                //     break;
+                case 'Add Employee':
+                    addEmployee();
+                    break;
 
-                // case 'Update Employee Role':
-                //     updateEmployeeRole();
-                //     break;
+                case 'Update Employee Role':
+                    updateEmployeeRole();
+                    break;
 
                 // case 'View All Roles':
                 //     viewRoles();
@@ -68,5 +68,47 @@ function viewEmployees() {
         init();
     });
 }
+
+function addEmployee() {
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'first_name',
+                message: 'What is the employee\'s first name?'
+            },
+            {
+                type: 'input',
+                name: 'last_name',
+                message: 'What is the employee\'s last name?'
+            },
+            {
+                type: 'input',
+                name: 'role_id',
+                message: 'What is the employee\'s role ID?'
+            },
+            {
+                type: 'input',
+                name: 'manager_id',
+                message: 'What is the employee\'s manager ID?'
+            }
+        ])
+        .then((answer) => {
+            db.query(`INSERT INTO employee SET ?`,
+                {
+                    first_name: answer.first_name,
+                    last_name: answer.last_name,
+                    role_id: answer.role_id,
+                    manager_id: answer.manager_id
+                },
+                (err, res) => {
+                    if (err) throw err;
+                    console.log(`Employee added!\n`);
+                    init();
+                }
+            );
+        });
+}
+
 
 init();
