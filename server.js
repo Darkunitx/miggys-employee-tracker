@@ -110,5 +110,59 @@ function addEmployee() {
         });
 }
 
+function updateEmployeeRole() {
+
+    db.query(`SELECT * FROM employee`, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        employeeList = res.map(employee => {
+            return {
+                name: `${employee.first_name} ${employee.last_name}`,
+                value: employee.id
+            }
+        });
+
+        db.query(`SELECT * FROM role`, (err, res) => {
+            if (err) throw err;
+            console.table(res);
+            roleList = res.map(role => {
+                return {
+                    name: role.title,
+                    value: role.id
+                }
+            });
+
+            inquirer
+                .prompt([
+                    {
+                        type: 'list',
+                        name: 'employee',
+                        message: 'Which employee would you like to update?',
+                        choices: employeeList
+                    },
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: 'What is the employee\'s new role?',
+                        choices: roleList
+                    }
+                ])
+                .then((answer) => {
+                    db.query(`UPDATE employee SET role_id = ? WHERE id = ?`,
+                        [
+                            answer.role,
+                            answer.employee
+                        ],
+                        (err, res) => {
+                            if (err) throw err;
+                            console.log(`Employee updated!\n`);
+                            init();
+                        }
+                    );
+                });
+        });
+    });
+}
+
 
 init();
