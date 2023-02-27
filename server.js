@@ -6,9 +6,7 @@ require('console.table');
 const db = mysql.createConnection(
     {
         host: 'localhost',
-        // MySQL username,
         user: 'root',
-        // TODO: Add MySQL password here
         password: '',
         database: 'employees_db'
     },
@@ -37,9 +35,9 @@ function init() {
                     updateEmployeeRole();
                     break;
 
-                // case 'View All Roles':
-                //     viewRoles();
-                //     break;
+                case 'View All Roles':
+                    viewRoles();
+                    break;
 
                 // case 'Add Role':
                 //     addRole();
@@ -60,16 +58,36 @@ function init() {
         });
 }
 
+// STILL NEED TO SHOW MANAGER INSTEAD OF MANAGER_ID
 function viewEmployees() {
     console.log('Viewing all employees...\n');
-    db.query(`SELECT * FROM employee`, (err, res) => {
+    db.query(`SELECT role_id AS ID, first_name, last_name, title, department_name, salary, manager_id AS manager FROM employee JOIN role ON employee.role_id = role.id JOIN department on role.department_id = department.id ORDER BY role.id`, (err, res) => {
         if (err) throw err;
         console.table(res);
         init();
     });
 }
 
+// STILL NEED TO NARROW DOWN MANAGER LIST TO ONLY EMPLOYEES WITH MANAGER_ID = NULL
 function addEmployee() {
+    db.query(`SELECT * FROM role`, (err, roles) => {
+        if (err) throw err;
+        roles = roles.map((role) => {
+            return {
+                name: role.title,
+                value: role.id
+            }
+        });
+
+    db.query(`SELECT * FROM employee`, (err, employees) => {    
+        if (err) throw err;
+        employees = employees.map((employee) => {
+            return {
+                name: `${employee.first_name} ${employee.last_name}`,
+                value: employee.id
+            }
+    });
+
     inquirer
         .prompt([
             {
@@ -83,14 +101,16 @@ function addEmployee() {
                 message: 'What is the employee\'s last name?'
             },
             {
-                type: 'input',
-                name: 'role_id',
-                message: 'What is the employee\'s role ID?'
+                type: 'list',
+                name: 'role',
+                message: 'What is the employee\'s role?',
+                choices: roles
             },
             {
-                type: 'input',
-                name: 'manager_id',
-                message: 'What is the employee\'s manager ID?'
+                type: 'list',
+                name: 'manager',
+                message: 'Who is the employee\'s manager?',
+                choices: employees
             }
         ])
         .then((answer) => {
@@ -98,7 +118,7 @@ function addEmployee() {
                 {
                     first_name: answer.first_name,
                     last_name: answer.last_name,
-                    role_id: answer.role_id,
+                    role_id: answer.role,
                     manager_id: answer.manager_id
                 },
                 (err, res) => {
@@ -108,8 +128,11 @@ function addEmployee() {
                 }
             );
         });
+    });
+    });
 }
 
+// FINISHED
 function updateEmployeeRole() {
 
     db.query(`SELECT * FROM employee`, (err, res) => {
@@ -161,6 +184,16 @@ function updateEmployeeRole() {
                     );
                 });
         });
+    });
+}
+
+// FINISHED
+function viewRoles() {
+    console.log('Viewing all roles...\n');
+    db.query(`SELECT role_id AS ID, title, department_name AS department, salary FROM employee JOIN role ON employee.role_id = role.id JOIN department on role.department_id = department.id ORDER BY role.id`, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
     });
 }
 
