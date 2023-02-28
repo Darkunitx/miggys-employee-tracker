@@ -10,7 +10,7 @@ const db = mysql.createConnection(
         password: '',
         database: 'employees_db'
     },
-    console.log(`Connected to the movies_db database.`)
+    console.log(`Connected to the Employee database.`)
 );
 
 function init() {
@@ -39,13 +39,13 @@ function init() {
                     viewRoles();
                     break;
 
-                // case 'Add Role':
-                //     addRole();
-                //     break;
+                case 'Add Role':
+                    addRole();
+                    break;
 
-                // case 'View all Departments':
-                //     viewDepartments();
-                //     break;
+                case 'View all Departments':
+                    viewDepartments();
+                    break;
 
                 // case 'Add Department':
                 //     addDepartment();
@@ -79,56 +79,56 @@ function addEmployee() {
             }
         });
 
-    db.query(`SELECT * FROM employee`, (err, employees) => {    
-        if (err) throw err;
-        employees = employees.map((employee) => {
-            return {
-                name: `${employee.first_name} ${employee.last_name}`,
-                value: employee.id
-            }
-    });
-
-    inquirer
-        .prompt([
-            {
-                type: 'input',
-                name: 'first_name',
-                message: 'What is the employee\'s first name?'
-            },
-            {
-                type: 'input',
-                name: 'last_name',
-                message: 'What is the employee\'s last name?'
-            },
-            {
-                type: 'list',
-                name: 'role',
-                message: 'What is the employee\'s role?',
-                choices: roles
-            },
-            {
-                type: 'list',
-                name: 'manager',
-                message: 'Who is the employee\'s manager?',
-                choices: employees
-            }
-        ])
-        .then((answer) => {
-            db.query(`INSERT INTO employee SET ?`,
-                {
-                    first_name: answer.first_name,
-                    last_name: answer.last_name,
-                    role_id: answer.role,
-                    manager_id: answer.manager_id
-                },
-                (err, res) => {
-                    if (err) throw err;
-                    console.log(`Employee added!\n`);
-                    init();
+        db.query(`SELECT * FROM employee`, (err, employees) => {
+            if (err) throw err;
+            employees = employees.map((employee) => {
+                return {
+                    name: `${employee.first_name} ${employee.last_name}`,
+                    value: employee.id
                 }
-            );
+            });
+
+            inquirer
+                .prompt([
+                    {
+                        type: 'input',
+                        name: 'first_name',
+                        message: 'What is the employee\'s first name?'
+                    },
+                    {
+                        type: 'input',
+                        name: 'last_name',
+                        message: 'What is the employee\'s last name?'
+                    },
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: 'What is the employee\'s role?',
+                        choices: roles
+                    },
+                    {
+                        type: 'list',
+                        name: 'manager',
+                        message: 'Who is the employee\'s manager?',
+                        choices: employees
+                    }
+                ])
+                .then((answer) => {
+                    db.query(`INSERT INTO employee SET ?`,
+                        {
+                            first_name: answer.first_name,
+                            last_name: answer.last_name,
+                            role_id: answer.role,
+                            manager_id: answer.manager_id
+                        },
+                        (err, res) => {
+                            if (err) throw err;
+                            console.log(`Employee added!\n`);
+                            init();
+                        }
+                    );
+                });
         });
-    });
     });
 }
 
@@ -190,12 +190,69 @@ function updateEmployeeRole() {
 // FINISHED
 function viewRoles() {
     console.log('Viewing all roles...\n');
-    db.query(`SELECT role_id AS ID, title, department_name AS department, salary FROM employee JOIN role ON employee.role_id = role.id JOIN department on role.department_id = department.id ORDER BY role.id`, (err, res) => {
+    db.query(`SELECT * FROM role JOIN department on role.department_id = department.id ORDER BY role.id`, (err, res) => {
         if (err) throw err;
         console.table(res);
         init();
     });
 }
 
+// FINMIHED
+function addRole() {
+    db.query(`SELECT * FROM department`, (err, res) => {
+        if (err) throw err;
+        departmentList = res.map(department => {
+            return {
+                name: department.department_name,
+                value: department.id
+            }
+        });
+
+        db.query(`SELECT * FROM role`, (err, res) => {
+            if (err) throw err;
+            roleList = res.map(role => {
+                return {
+                    name: role.title,
+                    value: role.id
+                }
+            });
+
+            inquirer
+                .prompt([
+                    {
+                        type: 'input',
+                        name: 'title',
+                        message: 'What is the name of the role?'
+                    },
+                    {
+                        type: 'input',
+                        name: 'salary',
+                        message: 'What is the salary of the role?'
+                    },
+                    {
+                        type: 'list',
+                        name: 'department',
+                        message: 'What department is the role in?',
+                        choices: departmentList
+                    }
+                ])
+                .then((answer) => {
+                    db.query(`INSERT INTO role SET ?`,
+                        {
+                            title: answer.title,
+                            salary: answer.salary,
+                            department_id: answer.department
+                        },
+                        (err, res) => {
+                            if (err) throw err;
+                            console.log(`Role added!\n`);
+                            init();
+                        }
+                    );
+                });
+        });
+    });
+
+}
 
 init();
