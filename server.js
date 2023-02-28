@@ -47,13 +47,13 @@ function init() {
                     viewDepartments();
                     break;
 
-                // case 'Add Department':
-                //     addDepartment();
-                //     break;
+                case 'Add Department':
+                    addDepartment();
+                    break;
 
-                // case 'Exit':
-                //     db.end();
-                //     break;
+                case 'Exit':
+                    db.end();
+                    break;
             }
         });
 }
@@ -253,6 +253,38 @@ function addRole() {
         });
     });
 
+}
+
+function viewDepartments() {
+    console.log('Viewing all departments...\n');
+    db.query(`SELECT * FROM department`, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
+    });
+}
+
+function addDepartment() {
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'department_name',
+                message: 'What is the name of the department?'
+            }
+        ])
+        .then((answer) => {
+            db.query(`INSERT INTO department SET ?`,
+                {
+                    department_name: answer.department_name
+                },
+                (err, res) => {
+                    if (err) throw err;
+                    console.log(`Department added!\n`);
+                    init();
+                }
+            );
+        });
 }
 
 init();
