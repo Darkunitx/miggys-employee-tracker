@@ -58,7 +58,6 @@ function init() {
         });
 }
 
-// STILL NEED TO SHOW MANAGER INSTEAD OF MANAGER_ID
 function viewEmployees() {
     console.log('Viewing all employees...\n');
     db.query(`SELECT role_id AS ID, first_name, last_name, title, department_name, salary, manager_id AS manager FROM employee JOIN role ON employee.role_id = role.id JOIN department on role.department_id = department.id ORDER BY role.id`, (err, res) => {
@@ -68,7 +67,7 @@ function viewEmployees() {
     });
 }
 
-// STILL NEED TO NARROW DOWN MANAGER LIST TO ONLY EMPLOYEES WITH MANAGER_ID = NULL
+
 function addEmployee() {
     db.query(`SELECT * FROM role`, (err, roles) => {
         if (err) throw err;
@@ -132,7 +131,6 @@ function addEmployee() {
     });
 }
 
-// FINISHED
 function updateEmployeeRole() {
 
     db.query(`SELECT * FROM employee`, (err, res) => {
@@ -187,7 +185,6 @@ function updateEmployeeRole() {
     });
 }
 
-// FINISHED
 function viewRoles() {
     console.log('Viewing all roles...\n');
     db.query(`SELECT * FROM role JOIN department on role.department_id = department.id ORDER BY role.id`, (err, res) => {
@@ -197,7 +194,6 @@ function viewRoles() {
     });
 }
 
-// FINMIHED
 function addRole() {
     db.query(`SELECT * FROM department`, (err, res) => {
         if (err) throw err;
