@@ -12,6 +12,7 @@
 
 ## Usage
 - <a href="https://github.com/Darkunitx/miggys-employee-tracker">My Employee Tracker Github Repo</a>
+- <a href="https://drive.google.com/file/d/10fSfHIniApWQcvZn7ymqNGxS4SCQEM8R/view">Demo Video</a>
 
 ![Notes app screenshot](./assets/images/9vOMXolRAm.png)
 
